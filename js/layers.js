@@ -145,96 +145,7 @@ player.subatomic.proton += 1
 
 },
 
-upgrades: {
-    11:
-    {
-        
-        unlocked() {return hasMilestone("Progression",1)},
-        
-        fullDisplay() {return "<h3>Helium hydride</h3><br><h4>The very first compound.</h4><br>Protium, deuterium and helium-3 costs nothing<br>Requires 1 helium-4 and 1 protium"},
-        canAfford() {if (player.atomic.He4 >= 1 && player.atomic.protium >= 1) {return true}
-    else {return false}},
-    pay() {
-        player.atomic.He4 -= 1
-        player.atomic.protium -= 1
-    }
-    },
 
-    12: {
-        
-        unlocked() {return hasMilestone("Progression", 2)},
-        canAfford () {return player.Iron.Iron >= 3 && player.Nickel.Nickel >= 1},
-        fullDisplay() {return "<h3>Antitaenite</h3><br>Requires 3 iron and 1 nickel"},
-        pay() {
-            player.Iron.spare -= 3
-            player.Nickel.spare -= 1
-        }
-    },
-
-    13: {
-        unlocked() {return hasMilestone("Progression", 2)},
-        canAfford() {return player.Nickel.Nickel >= 2 && player.Iron.Iron >= 1},
-        fullDisplay() {return "<h3>Awaruite</h2><br>Requires 2 nickel and 1 iron"},
-        pay() {
-            player.Iron.spare -= 1
-            player.Nickel.spare -= 2
-        }
-    },
-
-    14: {
-        unlocked() {return hasMilestone("Progression", 2)},
-        canAfford() {return player.Nickel.Nickel >= 1 &&  player.Iron.Iron >= 9},
-        fullDisplay() {return "<h3>Kamacite</h3><br>Requires 1 nickel and 9 iron"},
-        pay() {
-            player.Iron.spare -= 9
-            player.Nickel.spare -= 1
-        }
-
-    },
-
-    15: {
-        unlocked() {return hasMilestone("Progression", 2)},
-        canAfford() {return player.Nickel.Nickel >= 1 && player.Iron.Iron >= 1},
-        fullDisplay() {return "<h3>Taenite</h3><br>Requires 1 nickel and 1 iron"},
-        pay() {
-            player.Iron.spare -= 1
-            player.Nickel.spare -= 1
-        }
-    },
-
-    16: {
-        unlocked() {return hasMilestone("Progression", 2)},
-        canAfford() {return player.Nickel.Nickel >= 1 && player.Iron.Iron >= 1},
-        fullDisplay() {return "<h3>Tetrataenite</h3><br>Requires 1 nickel and 1 iron"},
-        pay() {
-            player.Iron.spare -= 1
-            player.Nickel.spare -= 1
-        }
-    },
-
-    17: {
-        unlocked() {return hasMilestone("Progression", 2)},
-        canAfford() {return player.Magnesium.Magnesium >= 2 && player.Silicon.Silicon >= 1 && player.Oxygen.Oxygen >= 4},
-        fullDisplay() {return "<h3>Forsterite</h3><br>Requires 2 magnesium, 1 silicon and 4 oxygen"},
-        pay() {
-            player.Magnesium.spare -= 2
-            player.Silicon.spare -= 1
-            player.Oxygen.spare -= 4
-        }
-    },
-
-    18: {
-        unlocked() {return hasMilestone("Progression", 2)},
-        canAfford() {return player.Sodium.Sodium >= 1 && player.Aluminium.Aluminium >= 1 && player.Silicon.Silicon >= 3 && player.Oxygen.Oxygen >= 8},
-        fullDisplay() {return "<h3>Plagioclase</h3><br>Requires 1 sodium, 1 aluminium. 3 silicon and 8 oxygen."},
-        pay() {
-            player.Sodium.spare -= 1
-            player.Aluminium.spare -= 1
-            player.Silicon.spare -= 3
-            player.Oxygen.spare -= 8
-        }
-    }
-},
 
 grid: {
     rows: 10,
@@ -447,10 +358,22 @@ automate() {
     if (player.subtabs.atomic.mainTabs == "Stars" && (player.navTab == "atomic"||player.tab == "atomic")) {
         player.subtabs.atomic.mainTabs = "Periodic table"
         player.navTab = "atomic"
+        player.subtabs.Stars.mainTabs = "Stars"
         player.tab = "Stars"
     }
     if (player.subtabs.atomic.mainTabs == "Periodic table"&&(player.navTab == "atomic"||player.tab=="atomic")){
         player.navTab = "atomic"
+    }
+
+    else if (player.subtabs.atomic.mainTabs == "Upgrades"&&player.navTab == "atomic") {
+        player.subtabs.atomic.mainTabs = "Periodic table"
+        player.subtabs.Stars.mainTabs = "Upgrades"
+        player.tab = "Stars"
+    }
+
+    else if (player.subtabs.Stars.mainTabs == "Stars" && player.subtabs.atomic.mainTabs == "Periodic table ") {
+        player.tab = "none"
+        player.subtabs.atomic.mainTabs = "Periodic table"
     }
     else {
         if (player.subtabs.atomic.mainTabs != "Periodic table"&&player.navTab=="atomic") {
@@ -458,9 +381,10 @@ automate() {
         }
         if (player.subtabs.atomic.mainTabs != "Stars"&&player.tab=="atomic")
         {player.navTab = "tree-tab"}
-        
-
     }
+
+    
+    
 
     if (player.navTab == "atomic"&&player.tab=="atomic"&&player.subtabs.atomic.mainTabs == "Periodic table") {
         player.tab="none"
@@ -487,8 +411,12 @@ unlocked() {
     content: [
         "grid"
     ],
-    unlocked() {return hasMilestone("Progression", 1)}
+    unlocked() {return hasMilestone("Progression", 1)&& (player.tab != "Stars" || player.subtabs.Stars.mainTabs != "Stars")}
     
+},
+
+"Periodic table ": {
+    unlocked() {return player.tab == "Stars" && player.subtabs.Stars.mainTabs == "Stars"}
 },
 
 "Upgrades": {
@@ -1067,7 +995,96 @@ addLayer("Stars", {
         toGen: 0
 
     }},
+    upgrades: {
+        11:
+        {
+            
+            unlocked() {return hasMilestone("Progression",1)},
+            
+            fullDisplay() {return "<h3>Helium hydride</h3><br><h4>The very first compound.</h4><br>Protium, deuterium and helium-3 costs nothing<br>Requires 1 helium-4 and 1 protium"},
+            canAfford() {if (player.atomic.He4 >= 1 && player.atomic.protium >= 1) {return true}
+        else {return false}},
+        pay() {
+            player.atomic.He4 -= 1
+            player.atomic.protium -= 1
+        }
+        },
     
+        12: {
+            
+            unlocked() {return hasMilestone("Progression", 2)},
+            canAfford () {return player.Iron.Iron >= 3 && player.Nickel.Nickel >= 1},
+            fullDisplay() {return "<h3>Antitaenite</h3><br>Requires 3 iron and 1 nickel"},
+            pay() {
+                player.Iron.spare -= 3
+                player.Nickel.spare -= 1
+            }
+        },
+    
+        13: {
+            unlocked() {return hasMilestone("Progression", 2)},
+            canAfford() {return player.Nickel.Nickel >= 2 && player.Iron.Iron >= 1},
+            fullDisplay() {return "<h3>Awaruite</h2><br>Requires 2 nickel and 1 iron"},
+            pay() {
+                player.Iron.spare -= 1
+                player.Nickel.spare -= 2
+            }
+        },
+    
+        14: {
+            unlocked() {return hasMilestone("Progression", 2)},
+            canAfford() {return player.Nickel.Nickel >= 1 &&  player.Iron.Iron >= 9},
+            fullDisplay() {return "<h3>Kamacite</h3><br>Requires 1 nickel and 9 iron"},
+            pay() {
+                player.Iron.spare -= 9
+                player.Nickel.spare -= 1
+            }
+    
+        },
+    
+        15: {
+            unlocked() {return hasMilestone("Progression", 2)},
+            canAfford() {return player.Nickel.Nickel >= 1 && player.Iron.Iron >= 1},
+            fullDisplay() {return "<h3>Taenite</h3><br>Requires 1 nickel and 1 iron"},
+            pay() {
+                player.Iron.spare -= 1
+                player.Nickel.spare -= 1
+            }
+        },
+    
+        16: {
+            unlocked() {return hasMilestone("Progression", 2)},
+            canAfford() {return player.Nickel.Nickel >= 1 && player.Iron.Iron >= 1},
+            fullDisplay() {return "<h3>Tetrataenite</h3><br>Requires 1 nickel and 1 iron"},
+            pay() {
+                player.Iron.spare -= 1
+                player.Nickel.spare -= 1
+            }
+        },
+    
+        17: {
+            unlocked() {return hasMilestone("Progression", 2)},
+            canAfford() {return player.Magnesium.Magnesium >= 2 && player.Silicon.Silicon >= 1 && player.Oxygen.Oxygen >= 4},
+            fullDisplay() {return "<h3>Forsterite</h3><br>Requires 2 magnesium, 1 silicon and 4 oxygen"},
+            pay() {
+                player.Magnesium.spare -= 2
+                player.Silicon.spare -= 1
+                player.Oxygen.spare -= 4
+            }
+        },
+    
+        18: {
+            unlocked() {return hasMilestone("Progression", 2)},
+            canAfford() {return player.Sodium.Sodium >= 1 && player.Aluminium.Aluminium >= 1 && player.Silicon.Silicon >= 3 && player.Oxygen.Oxygen >= 8},
+            fullDisplay() {return "<h3>Plagioclase</h3><br>Requires 1 sodium, 1 aluminium. 3 silicon and 8 oxygen."},
+            pay() {
+                player.Sodium.spare -= 1
+                player.Aluminium.spare -= 1
+                player.Silicon.spare -= 3
+                player.Oxygen.spare -= 8
+            }
+        }
+    },
     update(diff) {
         
         if (player.Stars.starGeneration) {
@@ -1111,10 +1128,22 @@ addLayer("Stars", {
         }
 
     },
-    tabFormat: [
+    tabFormat: {
+
+        "Stars": {
+        content: [
         ["display-text", function() {return "Generate metals from stars! Select an element from the left and click the button to generate the element for free by using the power of stars! The elements that you CANNOT select are red."}],
-        "clickables"
-    ]
+        "clickables"],
+        unlocked() {return player.subtabs.Stars.mainTabs == "Stars"}
+    },
+
+        "Upgrades": {
+            content: [
+                "upgrades"
+            ],
+            unlocked() {return player.subtabs.Stars.mainTabs == "Upgrades"}
+        }
+    }
 })
 
 addLayer("Magnesium", {
