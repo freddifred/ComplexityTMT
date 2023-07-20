@@ -1160,7 +1160,8 @@ addLayer("Stars", {
         timer: 0,
         time: 10,
         canGen: [315, 317, 319, 402, 405, 407, 409, 411],
-        starGeneration: false
+        starGeneration: false,
+        toGen: 0
 
     }},
     
@@ -1175,9 +1176,10 @@ addLayer("Stars", {
         }
 
         else {
-            player[player.Stars.dictionary[player.Stars.selected]].spare += 1
+            player[player.Stars.toGen].spare += 1
             player.Stars.timer=0
-            doPopup("none", "Total " + player.Stars.dictionary[player.Stars.selected] + ": " + (player[player.Stars.dictionary[player.Stars.selected]][player.Stars.dictionary[player.Stars.selected]]+1), player.Stars.dictionary[player.Stars.selected] + " + 1!", 1, "white")
+            
+            doPopup("none", "Total " + player.Stars.toGen + ": " + (player[player.Stars.toGen][player.Stars.toGen]+1), player.Stars.toGen + " + 1!", 1, "white")
             player.Stars.starGeneration = false
             save()
             options['autosave'] = true
@@ -1191,8 +1193,10 @@ addLayer("Stars", {
             display() {return "Time remaining: " + player.Stars.timer.toFixed(2) + "s"},
             canClick() {return player.Stars.selected != 0 && player.Stars.timer.toFixed(2) == 0.00},
             onClick() {
+                player.Stars.toGen = player.Stars.dictionary[player.Stars.selected]
                 player.Stars.starGeneration = true
                 options['autosave'] = false 
+                
                 if (player.Stars.canGen.includes (player.Stars.selected)){
                     player.Stars.timer = player.Stars.time
                     if (player.Stars.selected == 101) {player.Stars.timer = 0}}           
