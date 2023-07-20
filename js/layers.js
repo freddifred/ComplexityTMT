@@ -49,7 +49,7 @@ addLayer("atomic", {
         
         tritium: 0,
         He4: 0,
-        
+        mode: "nucleosynthesis",
         
         accessElems: [101, 119, 202, 215, 217, 219, 315, 317, 319, 402, 405, 407, 409, 411]
         
@@ -67,12 +67,12 @@ clickables: {
     11: {
         title: "Protium",
         display: "Requires 1 proton",
-        canClick() {if (player.subatomic.proton >= 1||hasUpgrade("atomic",11)) {
+        canClick() {if (player.subatomic.proton >= 1||hasUpgrade("Stars",11)) {
             
             return true
         }
     else {return false}},
-    onClick() {if (!hasUpgrade("atomic",11)) {
+    onClick() {if (!hasUpgrade("Stars",11)) {
         player.subatomic.proton -= 1}
     player.atomic.protium += 1
 
@@ -81,12 +81,12 @@ clickables: {
     12: {
         title: "Deuterium",
         display: "Requires 1 proton and 1 neutron",
-        canClick() {if ((player.subatomic.proton >= 1 && player.subatomic.neutron >= 1)||hasUpgrade("atomic",11)) {
+        canClick() {if ((player.subatomic.proton >= 1 && player.subatomic.neutron >= 1)||hasUpgrade("Stars",11)) {
             
             return true
         }
     else {return false}},
-    onClick() {if (!hasUpgrade("atomic",11)) {
+    onClick() {if (!hasUpgrade("Stars",11)) {
         player.subatomic.proton -= 1
         player.subatomic.neutron -= 1}
     player.atomic.deuterium += 1
@@ -142,7 +142,18 @@ player.subatomic.proton += 1
 }
 },
 
+21: {
+    unlocked() {return hasMilestone("Progression", 5)},
+    title: "Toggle mode",
+    canClick: true,
+    display() {
+        if (player.atomic.mode == "nucleosynthesis") {return "Mode: nucleosynthesis"}
+        else {return "Mode: Stars<br>" + player.Stars.timer.toFixed(2) + "s"}},
+    onClick() {if (player.atomic.mode == "nucleosynthesis") {player.atomic.mode = "Stars"}
+else {player.atomic.mode = "nucleosynthesis"}},
 
+
+    }
 },
 
 
@@ -155,12 +166,21 @@ grid: {
     },
 
     onClick(data, id) {
-        if (player.tab != "Stars"&&player.atomic.accessElems.includes(id)) {
+        if ((player.tab != "Stars"||player.subtabs.Stars.mainTabs != "Stars")&&player.atomic.accessElems.includes(id)&&player.atomic.mode == "nucleosynthesis") {
             player.tab = player.Stars.dictionary[id]
         }
-        if (player.Stars.canGen.includes(id) && player.tab == "Stars") {player.Stars.selected = id}
+        if (player.Stars.canGen.includes(id) && ((player.tab == "Stars"&&player.subtabs.Stars.mainTabs == "Stars")||player.atomic.mode == "Stars")) {player.Stars.selected = id}
+        if (player.Stars.canGen.includes(id) && player.atomic.mode == "Stars") {player.Stars.toGen = player.Stars.dictionary[player.Stars.selected]
+            player.Stars.starGeneration = true
+            options['autosave'] = false 
+            
+            if (player.Stars.canGen.includes (player.Stars.selected)){
+                player.Stars.timer = player.Stars.time
+                if (player.Stars.selected == 101) {player.Stars.timer = 0}} }
         
-        if (player.tab != "Stars") {player.Stars.selected = 0}
+        if (player.tab != "Stars"&&player.atomic.mode == "nucleosynthsis") {player.Stars.selected = 0}
+
+        
     },
     getStyle(data, id) {
         let elems =  [102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 404, 504, 604, 704, 801, 802, 803, 804, 805, 806, 807, 808, 809, 810, 811, 812, 813, 814, 815, 816, 817, 818, 819, 901, 902, 903, 904, 919, 1001, 1002, 1003, 1004, 1019]
@@ -178,7 +198,7 @@ grid: {
             }
         }
 
-        else if ((!player.Stars.canGen.includes(id) && player.tab == "Stars")||(player.tab != "Stars" && !player.atomic.accessElems.includes(id))) {
+        else if ((!player.Stars.canGen.includes(id) && ((player.tab == "Stars"&&player.subtabs.Stars.mainTabs == "Stars")||player.atomic.mode == "Stars"))||((player.subtabs.Stars.mainTab != "Stars"||player.tab != "Stars") && !player.atomic.accessElems.includes(id))) {
             return {
                 "background-color": "red",
                 "width": "25px",
@@ -400,7 +420,7 @@ tabFormat: {
     ["display-text",
     function() { if (hasMilestone("Progression", 0)) {return "Protium: " + player.atomic.protium + "<br>Deuterium: " + player.atomic.deuterium + "<br>Helium-3: " + player.atomic.He3+ "<br>Tritium: " + player.atomic.tritium + "<br>Helium-4: " + player.atomic.He4}
 else { return "Protium: " + player.atomic.protium + "<br>Deuterium: " + player.atomic.deuterium}}],
-    "clickables",
+    ["clickables", [1]],
     
 ],
 
@@ -409,6 +429,7 @@ unlocked() {
 
 "Periodic table": {
     content: [
+        ["clickables", [2]],
         "grid"
     ],
     unlocked() {return hasMilestone("Progression", 1)&& (player.tab != "Stars" || player.subtabs.Stars.mainTabs != "Stars")}
@@ -423,11 +444,11 @@ unlocked() {
     content: [
         "upgrades"
     ],
-    unlocked() {return hasMilestone("Progression", 1)}
+    unlocked() {return hasMilestone("Progression", 1) && !hasMilestone("Progression", 5)}
 },
 
 "Stars": {
-    unlocked() {return hasMilestone("Progression", 2)}
+    unlocked() {return hasMilestone("Progression", 2)&&!hasMilestone("Progression", 5)}
 }
 
 }
@@ -474,14 +495,14 @@ addLayer("Progression", {
     3: {
         requirementDescription: "Get Kamacite",
         effectDescription: "Stars waiting time is halved.",
-        done() {return hasUpgrade("atomic",14)},
+        done() {return hasUpgrade("Stars",14)},
         onComplete() {player.Stars.time = player.Stars.time / 2
     player.mainDisplay = "Asteroids are slowly colliding with each other"}
     },
     4: {
         requirementDescription: "Get Forsterite",
         effectDescription: "Stars can get magnesium and oxgyen",
-        done() {return hasUpgrade("atomic",17)},
+        done() {return hasUpgrade("Stars",17)},
         onComplete() {player.Stars.canGen.push(217,302)
             player.mainDisplay = "Asteroids are slowly colliding with each other"}
         
@@ -489,7 +510,7 @@ addLayer("Progression", {
     5: {
         requirementDescription: "Get all available upgrades and 10 water",
         effectDescription: "Unlock the life phase, can generate nitrogen via stars once got 1 by nucleosynthesis, can get hydrogen by stars instantly, can generate carbon via stars and halves normal star timer.",
-        done() {return hasUpgrade("atomic",11) && hasUpgrade("atomic",12) && hasUpgrade("atomic",13) && hasUpgrade("atomic",14) && hasUpgrade("atomic",15) && hasUpgrade("atomic",16) && hasUpgrade("atomic",17) && hasUpgrade("atomic",18) && player.Molecules.water >= 10},
+        done() {return hasUpgrade("Stars",11) && hasUpgrade("Stars",12) && hasUpgrade("Stars",13) && hasUpgrade("Stars",14) && hasUpgrade("Stars",15) && hasUpgrade("Stars",16) && hasUpgrade("Stars",17) && hasUpgrade("Stars",18) && player.Molecules.water >= 10},
         onComplete() {player.mainDisplay = "With an atmosphere and ocean slowly forming on earth, complex reactions are taking place."
     player.Molecules.water -= 10
 player.Stars.time = player.Stars.time / 2
@@ -523,12 +544,12 @@ addLayer("Hydrogen", {
         11: {
             title: "Protium",
             display: "Requires 1 proton",
-            canClick() {if (player.subatomic.proton >= 1||hasUpgrade("atomic",11)) {
+            canClick() {if (player.subatomic.proton >= 1||hasUpgrade("Stars",11)) {
                 
                 return true
             }
         else {return false}},
-        onClick() {if (!hasUpgrade("atomic",11)) {
+        onClick() {if (!hasUpgrade("Stars",11)) {
             player.subatomic.proton -= 1}
         player.atomic.protium += 1
     
@@ -536,12 +557,12 @@ addLayer("Hydrogen", {
 12: {
     title: "Deuterium",
     display: "Requires 1 proton and 1 neutron",
-    canClick() {if ((player.subatomic.proton >= 1 && player.subatomic.neutron >= 1)||hasUpgrade("atomic",11)) {
+    canClick() {if ((player.subatomic.proton >= 1 && player.subatomic.neutron >= 1)||hasUpgrade("Stars",11)) {
         
         return true
     }
 else {return false}},
-onClick() {if (!hasUpgrade("atomic",11)) {
+onClick() {if (!hasUpgrade("Stars",11)) {
     player.subatomic.proton -= 1
     player.subatomic.neutron -= 1}
 player.atomic.deuterium += 1
