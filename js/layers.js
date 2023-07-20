@@ -46,14 +46,11 @@ addLayer("atomic", {
         protium: 0,
         deuterium: 0,
         He3: 0,
-        He3Display: 0,
+        
         tritium: 0,
         He4: 0,
-        He4Display: 0,
-        He3R1: false,
-        He3R2: false,
-        He4R1: false,
-        He4R2: false,
+        
+        
         accessElems: [101, 119, 202, 215, 217, 219, 315, 317, 319, 402, 405, 407, 409, 411]
         
     }},
@@ -99,45 +96,19 @@ clickables: {
     13: {
         unlocked() {return hasMilestone("Progression", 0)},
         title: "Helium-3",
-        display() {if (player.atomic.He3Display % 2 == 0) {mainMessage =  "(1) Requires 1 proton and 1 deuterium<br><br>Shift click for alternate requirements!"
-
-        if (player.atomic.He3R1 == true) {
-            mainMessage = "Gotten!<br>" + mainMessage
-        }
-    return mainMessage
-    }
-        else {mainMessage =  "(2) Requires 2 deuterium but gives a bonus neutron<br><br>Shift click for alternate requirements!"
-
-        if (player.atomic.He3R2 == true) {
-            mainMessage = "Gotten!<br>" + mainMessage
-        }
-        return mainMessage
+        display() {
+        return "Requires 2 deuterium but gives a bonus neutron"
     
-    }},
-        canClick: true,
+    },
+        canClick () {return player.atomic.deuterium >= 2},
     
     onClick() {
-        if (shiftDown) {
-            player.atomic.He3Display+=1
-        }
-        else {
-            if (hasUpgrade("atomic",11)) {
-                player.atomic.He3 += 1
-
-            }
-            else if (player.atomic.He3Display % 2 ==0 && player.subatomic.proton>= 1 && player.atomic.deuterium >= 1) {
-                
-        player.subatomic.proton -= 1
-    player.atomic.deuterium -= 1
-player.atomic.He3 += 1
-player.atomic.He3R1 = true
-}
-else if (player.atomic.He3Display % 2 == 1 && player.atomic.deuterium >= 2){
+         
     player.atomic.deuterium -= 2
     player.subatomic.neutron += 1
     player.atomic.He3 += 1
-    player.atomic.He3R2 = true
-}}}},
+    
+}},
 14: {
     unlocked() {return hasMilestone("Progression", 0)},
     title: "Tritium",
@@ -155,42 +126,21 @@ player.atomic.tritium += 1},
 15: {
     unlocked() {return hasMilestone("Progression", 0)},
     title: "Helium-4",
-    display() {if (player.atomic.He4Display % 2 == 0) {mainMessage =  "(1) Requires 1 Helium-3 and 1 deuterium but gives a bonus proton<br><br>Shift click for alternate requirements!"
+    display() {
+    return "Requires 1 Helium-3 and 1 deuterium but gives a bonus proton"
 
-    if (player.atomic.He4R1 == true) {
-        mainMessage = "Gotten!<br>" + mainMessage
-    }
-
-    return mainMessage
-}
-    else {mainMessage =  "(2) Requires 1 tritium and 1 deuterium but gives a bonus neutron<br><br>Shift click for alternate requirements!"
-
-    if (player.atomic.He4R2 == true) {
-        mainMessage = "Gotten!<br>" + mainMessage
-    }
-    return mainMessage
-
-}},
-    canClick: true,
+},
+    canClick () {return player.atomic.He3 >= 1 && player.atomic.deuterium >= 1},
 
 onClick() {
-    if (shiftDown) {
-        player.atomic.He4Display+=1
-    }
-    else {
-        if (player.atomic.He4Display % 2 ==0 && player.atomic.He3 >= 1 && player.atomic.deuterium >= 1) {
+    
+        
     player.atomic.He3 -= 1
 player.atomic.deuterium -= 1
 player.atomic.He4 += 1
 player.subatomic.proton += 1
-player.atomic.He4R1 = true}
-else if (player.atomic.He4Display % 2 == 1 && player.atomic.deuterium >= 1 && player.atomic.tritium >= 1){
-player.atomic.deuterium -= 1
-player.atomic.tritium -= 1
-player.subatomic.neutron += 1
-player.atomic.He4 += 1
-player.atomic.He4R2 = true
-}}}},
+}
+},
 
 
 },
@@ -577,9 +527,9 @@ addLayer("Progression", {
         onComplete() {player.mainDisplay = "The first atoms are beginning to form. Big bang nucleosynthesis is beginning to occur."},
     },
     1: {
-        requirementDescription: "Have at least 1 of each isotope and you must have at some point used every available requirement",
+        requirementDescription: "Have at least 1 of each isotope",
         effectDescription: "Unlocks stellar formation and radioactivity.",
-        done() {if (player.atomic.protium >= 1 && player.atomic.deuterium >= 1 && player.atomic.He3R1 == true && player.atomic.He3R2 == true && player.atomic.tritium >= 1 && player.atomic.He4R1 == true && player.atomic.He4R2 == true) {return true}
+        done() {if (player.atomic.protium >= 1 && player.atomic.deuterium >= 1 && player.atomic.tritium >= 1 && player.atomic.He3 >= 1 && player.atomic.He4 >= 1) {return true}
     
     else {return false}},
     onComplete() {player.mainDisplay = "The void is becoming not so dark..."}
@@ -721,85 +671,38 @@ addLayer("Helium", {
         11: {
             unlocked() {return hasMilestone("Progression", 0)},
             title: "Helium-3",
-            display() {if (player.atomic.He3Display % 2 == 0) {mainMessage =  "(1) Requires 1 proton and 1 deuterium<br><br>Shift click for alternate requirements!"
-    
-            if (player.atomic.He3R1 == true) {
-                mainMessage = "Gotten!<br>" + mainMessage
-            }
-        return mainMessage
-        }
-            else {mainMessage =  "(2) Requires 2 deuterium but gives a bonus neutron<br><br>Shift click for alternate requirements!"
-    
-            if (player.atomic.He3R2 == true) {
-                mainMessage = "Gotten!<br>" + mainMessage
-            }
-            return mainMessage
+            display() {
+            return "Requires 2 deuterium but gives a bonus neutron"
         
-        }},
-            canClick: true,
+        },
+            canClick () {return player.atomic.deuterium >= 2},
         
         onClick() {
-            if (shiftDown) {
-                player.atomic.He3Display+=1
-            }
-            else {
-                if (hasUpgrade("atomic",11)) {
-                    player.atomic.He3 += 1
-    
-                }
-                else if (player.atomic.He3Display % 2 ==0 && player.subatomic.proton>= 1 && player.atomic.deuterium >= 1) {
-                    
-            player.subatomic.proton -= 1
-        player.atomic.deuterium -= 1
-    player.atomic.He3 += 1
-    player.atomic.He3R1 = true
-    }
-    else if (player.atomic.He3Display % 2 == 1 && player.atomic.deuterium >= 2){
+             
         player.atomic.deuterium -= 2
         player.subatomic.neutron += 1
         player.atomic.He3 += 1
-        player.atomic.He3R2 = true
-    }}}},
+        
+    }},
 
     12: {
         unlocked() {return hasMilestone("Progression", 0)},
         title: "Helium-4",
-        display() {if (player.atomic.He4Display % 2 == 0) {mainMessage =  "(1) Requires 1 Helium-3 and 1 deuterium but gives a bonus proton<br><br>Shift click for alternate requirements!"
+        display() {
+        return "Requires 1 Helium-3 and 1 deuterium but gives a bonus proton"
     
-        if (player.atomic.He4R1 == true) {
-            mainMessage = "Gotten!<br>" + mainMessage
-        }
-    
-        return mainMessage
-    }
-        else {mainMessage =  "(2) Requires 1 tritium and 1 deuterium but gives a bonus neutron<br><br>Shift click for alternate requirements!"
-    
-        if (player.atomic.He4R2 == true) {
-            mainMessage = "Gotten!<br>" + mainMessage
-        }
-        return mainMessage
-    
-    }},
-        canClick: true,
+    },
+        canClick () {return player.atomic.He3 >= 1 && player.atomic.deuterium >= 1},
     
     onClick() {
-        if (shiftDown) {
-            player.atomic.He4Display+=1
-        }
-        else {
-            if (player.atomic.He4Display % 2 ==0 && player.atomic.He3 >= 1 && player.atomic.deuterium >= 1) {
+        
+            
         player.atomic.He3 -= 1
     player.atomic.deuterium -= 1
     player.atomic.He4 += 1
     player.subatomic.proton += 1
-    player.atomic.He4R1 = true}
-    else if (player.atomic.He4Display % 2 == 1 && player.atomic.deuterium >= 1 && player.atomic.tritium >= 1){
-    player.atomic.deuterium -= 1
-    player.atomic.tritium -= 1
-    player.subatomic.neutron += 1
-    player.atomic.He4 += 1
-    player.atomic.He4R2 = true
-    }}}}},
+    }
+    }},
     tabFormat: [
         ["display-text",
                 function() {return "Helium: " + player.Helium.Helium + "<br>Helium-3: " + player.atomic.He3 + "<br>Helium-4: " + player.atomic.He4}],
@@ -1189,7 +1092,11 @@ addLayer("Stars", {
     
     clickables: {
         11: {
-            title() {return "Generate " + player.Stars.dictionary[player.Stars.selected]},
+            title() {
+                if (!player.Stars.starGeneration) 
+                {return "Generate " + player.Stars.dictionary[player.Stars.selected]}
+            
+            else {return "Generate " + player.Stars.toGen}},
             display() {return "Time remaining: " + player.Stars.timer.toFixed(2) + "s"},
             canClick() {return player.Stars.selected != 0 && player.Stars.timer.toFixed(2) == 0.00},
             onClick() {
