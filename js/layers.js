@@ -143,7 +143,7 @@ player.subatomic.proton += 1
 },
 
 21: {
-    unlocked() {return hasMilestone("Progression", 5)},
+    unlocked() {return hasMilestone("Progression", 2)},
     title: "Toggle mode",
     canClick: true,
     display() {
@@ -385,13 +385,13 @@ automate() {
         player.navTab = "atomic"
     }
 
-    else if (player.subtabs.atomic.mainTabs == "Upgrades"&&player.navTab == "atomic") {
+    else if (player.subtabs.atomic.mainTabs == "Upgrades"&&player.tab == "atomic") {
         player.subtabs.atomic.mainTabs = "Periodic table"
         player.subtabs.Stars.mainTabs = "Upgrades"
         player.tab = "Stars"
     }
 
-    else if (player.subtabs.Stars.mainTabs == "Stars" && player.subtabs.atomic.mainTabs == "Periodic table ") {
+    else if (player.subtabs.atomic.mainTabs == "Periodic table ") {
         player.tab = "none"
         player.subtabs.atomic.mainTabs = "Periodic table"
     }
@@ -399,18 +399,51 @@ automate() {
         if (player.subtabs.atomic.mainTabs != "Periodic table"&&player.navTab=="atomic") {
             player.tab="atomic"
         }
-        if (player.subtabs.atomic.mainTabs != "Stars"&&player.tab=="atomic")
+        if (player.subtabs.atomic.mainTabs == "Info"&&player.tab=="atomic")
         {player.navTab = "tree-tab"}
     }
 
-    
     
 
     if (player.navTab == "atomic"&&player.tab=="atomic"&&player.subtabs.atomic.mainTabs == "Periodic table") {
         player.tab="none"
     }
 
+    if (player.tab == "Molecules") {
+        player.subtabs.atomic.mainTabs = "Periodic table"
+        player.navTab = "atomic"
     
+    }
+
+    if (player.tab == "Stars" && player.subtabs.Stars.mainTabs == "Upgrades") {player.navTab = "atomic"}
+
+    
+},
+
+infoboxes: {
+    intro: {
+        title: "Intro",
+        body: 'Welcome to the atomic layer! This layer is a bit unusual and has 2 "modes" with another one planned (in the far future of the end game...) each revolving around the periodic table. Read the sections if ' + "you're stuck!" ,
+        unlocked() {return hasMilestone("Progression", 1)}
+    },
+
+    nucleosynthesis: {
+        title: "Nucleosynthesis mode",
+        body: "This is the default mode. In nucleosynthesis mode, when you click on an element in the periodic table, you will be taken to its layer where you can create isotopes of that element from nuclear reactions. The elements which you can access are in white and the elements which you can't access are in red.",
+        unlocked() {return hasMilestone("Progression", 1)}
+    },
+
+    star: {
+        title: "Star mode",
+        body: "This is the second mode of the layer. Here, you will be able to generate elements from stars! When you click on an element, a timer will start (the periodic table will also disappear to stop lag) and once the timer is completed, the amount of elements you get will increment by 1. The elements which you can generate is in white the onces which you cannot are red. Note that in order to unlock an element in the star mode, you will almost certainly have to get it via nucleosynthesis first (and sometimes additional requirements).",
+        unlocked() {return hasMilestone("Progression", 2)}
+    },
+
+    currencies: {
+        title: "Element currencies",
+        body: "The amount of elements you get is calculated by the sum of the isotopes + amount generated from stars. Note that when you purchase upgrades requiring elements, the amount generated from stars is subtracted by the cost, meaning that it's possible to have negative elements yet a few isotopes.",
+        unlocked() {return hasMilestone("Progression", 2)}
+    }
 },
 
 
@@ -427,17 +460,26 @@ else { return "Protium: " + player.atomic.protium + "<br>Deuterium: " + player.a
 unlocked() {
     return !hasMilestone("Progression",1)}},
 
+    "Info": {
+        unlocked() {return hasMilestone("Progression", 1)},
+        content: [
+            ["infobox",["intro"]],
+            ["infobox",["nucleosynthesis"]],
+            ["infobox",["star"]],
+            ["infobox",["currencies"]]
+        ]
+    },
 "Periodic table": {
     content: [
         ["clickables", [2]],
         "grid"
     ],
-    unlocked() {return hasMilestone("Progression", 1)&& (player.tab != "Stars" || player.subtabs.Stars.mainTabs != "Stars")}
+    unlocked() {return hasMilestone("Progression", 1)&& (player.tab != "Stars")}
     
 },
 
 "Periodic table ": {
-    unlocked() {return player.tab == "Stars" && player.subtabs.Stars.mainTabs == "Stars"}
+    unlocked() {return player.tab == "Stars" }
 },
 
 "Upgrades": {
@@ -446,10 +488,6 @@ unlocked() {
     ],
     unlocked() {return hasMilestone("Progression", 1) && !hasMilestone("Progression", 5)}
 },
-
-"Stars": {
-    unlocked() {return hasMilestone("Progression", 2)&&!hasMilestone("Progression", 5)}
-}
 
 }
 
@@ -1022,7 +1060,7 @@ addLayer("Stars", {
             
             unlocked() {return hasMilestone("Progression",1)},
             
-            fullDisplay() {return "<h3>Helium hydride</h3><br><h4>The very first compound.</h4><br>Protium, deuterium and helium-3 costs nothing<br>Requires 1 helium-4 and 1 protium"},
+            fullDisplay() {return "<h3>Helium hydride</h3><br><h4>The very first compound.</h4><br>Protium and deuterium costs nothing<br>Requires 1 helium-4 and 1 protium"},
             canAfford() {if (player.atomic.He4 >= 1 && player.atomic.protium >= 1) {return true}
         else {return false}},
         pay() {
@@ -1150,13 +1188,6 @@ addLayer("Stars", {
 
     },
     tabFormat: {
-
-        "Stars": {
-        content: [
-        ["display-text", function() {return "Generate metals from stars! Select an element from the left and click the button to generate the element for free by using the power of stars! The elements that you CANNOT select are red."}],
-        "clickables"],
-        unlocked() {return player.subtabs.Stars.mainTabs == "Stars"}
-    },
 
         "Upgrades": {
             content: [
