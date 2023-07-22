@@ -13,11 +13,14 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.1",
+	num: "0.1.1",
 	name: "Atomic 1 update",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
+
+	<h3>v0.1.1</h3><br>
+		- Bug fixes and making things easier to navigate/understand. <br><br>
 	<h3>v0.1</h3><br>
 		- Added content to RNA.<br>
 		`
